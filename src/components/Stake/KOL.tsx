@@ -5,13 +5,14 @@ import dynamic from "next/dynamic";
 import { Input } from "@nextui-org/input";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
+
 import { AccountAddress } from "@aptos-labs/ts-sdk";
 
 import Area from "./Area";
 
 import { API_URL, SOCIAL_ADDRESS } from "@/config/constants";
 import { accountKolBalance } from "@/view-functions/accountBalance";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface KOLProps extends React.HTMLAttributes<HTMLDivElement> { }
 
@@ -42,11 +43,11 @@ function KOL(props: KOLProps) {
 
   useEffect(() => {
     const fetchBalance = async () => {
-      if (!wallet.account) return;
+      if (!wallet.connected) return;
       if (!kolAddress) return;
       console.log("Fetching balance for KOL address: ", kolAddress);
       const res = await accountKolBalance({
-        accountAddress: AccountAddress.fromString(wallet.account.address),
+        accountAddress: AccountAddress.fromString(wallet.publicKey?.toBase58()!),
         kolAddress: AccountAddress.fromString(kolAddress),
       });
 
@@ -58,6 +59,9 @@ function KOL(props: KOLProps) {
 
   const handleStake = async (event: React.FormEvent) => {
     event.preventDefault();
+    /*
+    @todo: Need to convert to Solana
+    */
     await wallet.signAndSubmitTransaction({
       data: {
         function: `${SOCIAL_ADDRESS}::social::register_kol`,

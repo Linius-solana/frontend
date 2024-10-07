@@ -3,8 +3,6 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import { Input, Button } from "@nextui-org/react";
-import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { AccountAddress } from "@aptos-labs/ts-sdk";
 
 import Area from "./Area";
 
@@ -13,6 +11,7 @@ import {
   accountStakedAmount,
 } from "@/view-functions/accountBalance";
 import { SOCIAL_ADDRESS } from "@/config/constants";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 interface ProtocolProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -24,16 +23,16 @@ function Protocol(props: ProtocolProps) {
 
   useEffect(() => {
     const fetchBalance = async () => {
-      if (!wallet.account?.address) return;
+      if (!wallet.connected) return;
       const balance = await accountProtocolBalance({
-        accountAddress: AccountAddress.fromString(wallet.account.address),
+        accountAddress: wallet.publicKey.toBase58(),
       });
 
       setBalance(balance / 10 ** 8); // Convert the balance to the correct decimal
     };
 
     fetchBalance();
-  }, [wallet.account?.address]);
+  }, [wallet.publicKey]);
 
   useEffect(() => {
     const fetchStaked = async () => {

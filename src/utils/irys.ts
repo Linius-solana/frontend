@@ -1,14 +1,14 @@
 import { WebIrys } from "@irys/sdk";
-import { WalletContextState } from "@aptos-labs/wallet-adapter-react";
 import { AccountAddress } from "@aptos-labs/ts-sdk";
 
 import { accountAPTBalance } from "@/view-functions/accountBalance";
+import { WalletContextState } from "@solana/wallet-adapter-react";
 
-const getWebIrys = async (aptosWallet: WalletContextState) => {
+const getWebIrys = async (solonaWallet: WalletContextState) => {
   const network = "devnet"; // Irys network
-  const token = "aptos";
+  const token = "solona";
   const rpcUrl = "testnet"; // Aptos network "mainnet" || "testnet"
-  const wallet = { rpcUrl: rpcUrl, name: "aptos", provider: aptosWallet };
+  const wallet = { rpcUrl: rpcUrl, name: "solona", provider: solonaWallet };
   const webIrys = new WebIrys({ network, token, wallet });
 
   await webIrys.ready();
@@ -17,11 +17,11 @@ const getWebIrys = async (aptosWallet: WalletContextState) => {
 };
 
 export const checkIfFund = async (
-  aptosWallet: WalletContextState,
+  solonaWallet: WalletContextState,
   files: File[],
 ) => {
   // 1. estimate the gas cost based on the data size https://docs.irys.xyz/developer-docs/irys-sdk/api/getPrice
-  const webIrys = await getWebIrys(aptosWallet);
+  const webIrys = await getWebIrys(solonaWallet);
   const costToUpload = await webIrys.utils.estimateFolderPrice(
     files.map((f) => f.size),
   );
@@ -33,8 +33,12 @@ export const checkIfFund = async (
     return true;
   }
   // 4. if balance is not enough,  check the payer balance
-  const currentAccountAddress = await aptosWallet.account!.address;
+  const currentAccountAddress = solonaWallet.publicKey?.toBase58();
 
+  if (!currentAccountAddress) {
+    throw new Error("Account address not found");
+  }
+  
   const currentAccountBalance = await accountAPTBalance({
     accountAddress: AccountAddress.fromString(currentAccountAddress),
   });
@@ -42,7 +46,7 @@ export const checkIfFund = async (
   // 5. if payer balance > the amount based on the estimation, fund the irys node irys.fund, then upload
   if (currentAccountBalance > costToUpload.toNumber()) {
     try {
-      await fundNode(aptosWallet, costToUpload.toNumber());
+      await fundNode(solonaWallet, costToUpload.toNumber());
 
       return true;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -56,10 +60,10 @@ export const checkIfFund = async (
 };
 
 export const fundNode = async (
-  aptosWallet: WalletContextState,
+  solonaWallet: WalletContextState,
   amount?: number,
 ) => {
-  const webIrys = await getWebIrys(aptosWallet);
+  const webIrys = await getWebIrys(solonaWallet);
 
   try {
     const fundTx = await webIrys.fund(amount ?? 1000000);
@@ -72,10 +76,10 @@ export const fundNode = async (
 
 export const uploadFile = async (
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  aptosWallet: any,
+  solonaWallet: any,
   fileToUpload: File,
 ): Promise<string> => {
-  const webIrys = await getWebIrys(aptosWallet);
+  const webIrys = await getWebIrys(solonaWallet);
 
   try {
     const receipt = await webIrys.uploadFile(fileToUpload, { tags: [] });
@@ -88,10 +92,10 @@ export const uploadFile = async (
 };
 
 export const uploadFolder = async (
-  aptosWallet: WalletContextState,
+  solonaWallet: WalletContextState,
   files: File[],
 ): Promise<string[]> => {
-  const webIrys = await getWebIrys(aptosWallet);
+  const webIrys = await getWebIrys(solonaWallet);
 
   try {
     const receipt = await webIrys.uploadFolder(files); //returns the manifest ID

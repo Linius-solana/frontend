@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import { Card, CardBody } from "@nextui-org/card";
 import { Avatar, Divider } from "@nextui-org/react";
-import { truncateAddress } from "@aptos-labs/wallet-adapter-react";
+import { truncateText } from "@/helpers";
 
 export type ProfileComponentProps = {
   backgroundUrl: string;
@@ -64,7 +64,7 @@ const ProfileComponent = ({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-2 my-4 mx-2">
             <h3 className="text-2xl font-semibold text-foreground-900">
-              {truncateAddress(address)}
+              {truncateText(address, 10)}
             </h3>
             <div className="flex gap-4 mt-4 items-start flex-wrap w-full">
               <div className="flex gap-4">
