@@ -1,7 +1,18 @@
+import { useWallet } from "@solana/wallet-adapter-react";
+import React from "react";
+import axios from "axios";
+import { VersionedTransaction, Connection } from "@solana/web3.js";
+
+import { API_URL } from "@/config/constants";
+
 export type TransactionInfoProp = {
   time: Date;
-  address1: string;
-  address2: string;
+  action: string;
+  fromAmount: number;
+  fromToken: string;
+  toAmount: number;
+  toToken: string;
+  platform: string;
 };
 
 const calculateRelativeTime = (date: Date): string => {
@@ -32,58 +43,135 @@ const calculateRelativeTime = (date: Date): string => {
   return `${diffInMonths} month${diffInMonths !== 1 ? "s" : ""} ago`;
 };
 
-const TransactionInfo = ({ time, address1, address2 }: TransactionInfoProp) => {
+const TransactionInfo = ({
+  time,
+  action,
+  fromAmount,
+  fromToken,
+  toAmount,
+  toToken,
+  platform,
+}: TransactionInfoProp) => {
   const relativeTime = calculateRelativeTime(time);
+  const wallet = useWallet();
+
+  const swapTransaction = async () => {
+    if (!wallet || !wallet.publicKey) return;
+    const quoteUrl = `https://quote-api.jup.ag/v6/quote?inputMint=${fromToken}&outputMint=${toToken}&amount=10000&slippageBps=1500`;
+    const res = await axios.get(quoteUrl);
+
+    const swapTransactionResponse = await axios.post(
+      "https://quote-api.jup.ag/v6/swap",
+      {
+        quoteResponse: res.data,
+        userPublicKey: wallet.publicKey.toBase58(),
+        wrapAndUnwrapSol: true,
+      },
+      {
+        headers: { "Content-Type": "application/json" },
+      },
+    );
+    const swapTransaction = swapTransactionResponse.data;
+
+    console.log(swapTransaction);
+    const swapTransactionBuf = Buffer.from(
+      swapTransaction.swapTransaction,
+      "base64",
+    );
+    const swapTransactionArray = new Uint8Array(swapTransactionBuf);
+    const transaction = VersionedTransaction.deserialize(swapTransactionArray);
+
+    if (wallet?.sendTransaction) {
+      const connection = new Connection("https://api.mainnet.solana.com");
+
+      const signature = await wallet.sendTransaction(transaction, connection);
+
+      await connection.confirmTransaction(signature, "processed");
+    }
+
+    console.log(swapTransaction);
+  };
 
   return (
     <div className="w-full flex flex-row justify-between py-2 px-4 items-center space-x-4">
+      {/* Time Information */}
       <div className="text-purple-400 text-sm w-24">{relativeTime}</div>
+
+      {/* Transaction Information */}
       <div className="flex items-center space-x-2 flex-1">
-        <span className="bg-orange-500 text-black text-xs px-2 py-1 rounded-full">
-          Action
+        <button
+          className="bg-orange-500 text-black text-xs px-2 py-1 rounded-full"
+          onClick={(e) => {
+            e.preventDefault();
+            swapTransaction();
+          }}
+        >
+          {action}
+        </button>
+        <span className="text-gray-400 text-xs">
+          {fromAmount} {fromToken}
         </span>
-        <span className="text-gray-400 text-xs">{address1}</span>
-      </div>
-      <div className="flex items-center space-x-2 flex-1">
-        <span className="text-gray-400 text-xs">{address2}</span>
+        <span className="text-xs text-gray-400">for</span>
+        <span className="text-gray-400 text-xs">
+          {toAmount} {toToken}
+        </span>
+        <span className="text-xs text-gray-400">on</span>
+        <span className="text-gray-400 text-xs">{platform}</span>
       </div>
     </div>
   );
 };
 
-const TransactionComponent = () => {
-  const transactions = [
-    {
-      time: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      address1: "0x322...1234",
-      address2: "0x322...1234",
-    },
-    {
-      time: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      address1: "0x322...1234",
-      address2: "0x322...1234",
-    },
-    {
-      time: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      address1: "0x322...1234",
-      address2: "0x322...1234",
-    },
-    {
-      time: new Date(Date.now() - 12 * 60 * 60 * 1000),
-      address1: "0x322...1234",
-      address2: "0x322...1234",
-    },
-    {
-      time: new Date(Date.now() - 30 * 60 * 1000),
-      address1: "0x322...1234",
-      address2: "0x322...1234",
-    },
-  ];
+export type TokenInfo = {
+  mintAddress: string;
+  amount: number;
+};
+
+export type TxSwapInfo = {
+  buy: TokenInfo;
+  sell: TokenInfo;
+  block: {
+    time: number;
+    height: number;
+  };
+  transaction: {
+    signature: string;
+    feePayer: string;
+    signer: string;
+  };
+};
+
+const TransactionComponent = ({ address }: { address: string }) => {
+  const [transactions, setTransactions] = React.useState<TxSwapInfo[]>([]);
+
+  React.useEffect(() => {
+    const fetchTransactions = async () => {
+      const url = API_URL + "/api/v1/txs/get_swap";
+      const res = await axios.get<TxSwapInfo[]>(url, {
+        params: {
+          address,
+        },
+      });
+
+      setTransactions(res.data as TxSwapInfo[]);
+    };
+
+    fetchTransactions();
+  }, [address]);
 
   return (
     <div className="w-full flex flex-col gap-4">
       {transactions.map((transaction, index) => (
-        <TransactionInfo key={index} {...transaction} />
+        <TransactionInfo
+          key={index}
+          action="Swap"
+          fromAmount={transaction.sell.amount}
+          fromToken={transaction.sell.mintAddress}
+          platform="Raydium"
+          time={new Date(transaction.block.time)}
+          toAmount={transaction.buy.amount}
+          toToken={transaction.buy.mintAddress}
+        />
       ))}
     </div>
   );

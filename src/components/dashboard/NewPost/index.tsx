@@ -3,7 +3,6 @@
 import { Button } from "@nextui-org/button";
 import { Input, Textarea } from "@nextui-org/input";
 import React from "react";
-
 import {
   Connection,
   clusterApiUrl,
@@ -13,12 +12,11 @@ import {
   TransactionInstruction,
   PublicKey,
 } from "@solana/web3.js";
-
+import { useWallet, WalletContextState } from "@solana/wallet-adapter-react";
 
 import RepeatIcon from "@/components/shared/icon/RepeatIcon";
 import { uploadFolder } from "@/utils/irys";
 import { SOCIAL_ADDRESS } from "@/config/constants";
-import { useWallet, WalletContextState } from "@solana/wallet-adapter-react";
 
 const uploadPost = async (
   wallet: WalletContextState,
@@ -43,21 +41,18 @@ const uploadPost = async (
   */
   const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
   const payer = Keypair.generate();
-  const transaction =
-    new Transaction()
-      .add(
-        new TransactionInstruction({
-          keys: [{ pubkey: wallet.publicKey, isSigner: true, isWritable: true }],
-          programId: new PublicKey(SOCIAL_ADDRESS),
-          data: Buffer.from(JSON.stringify({
-            function: 'upload_post',
-            functionArguments: [
-              content,
-              uris,
-            ],
-          })),
+  const transaction = new Transaction().add(
+    new TransactionInstruction({
+      keys: [{ pubkey: wallet.publicKey, isSigner: true, isWritable: true }],
+      programId: new PublicKey(SOCIAL_ADDRESS),
+      data: Buffer.from(
+        JSON.stringify({
+          function: "upload_post",
+          functionArguments: [content, uris],
         }),
-      );
+      ),
+    }),
+  );
 
   try {
     await sendAndConfirmTransaction(connection, transaction, [payer]);
@@ -103,9 +98,9 @@ const NewPost = () => {
           />
           <Input
             ref={ref}
+            className="hidden"
             multiple={true}
             type="file"
-            className="hidden"
             onChange={(e) => {
               if (e.target.files) {
                 const files = Array.from(e.target.files);
@@ -114,16 +109,37 @@ const NewPost = () => {
               }
             }}
           />
-          <label
+          <input
+            ref={ref}
+            className="hidden"
+            id="file-input" // Add id to associate with label
+            multiple={true}
+            type="file"
+            onChange={(e) => {
+              if (e.target.files) {
+                const files = Array.from(e.target.files);
+
+                setImages(files);
+              }
+            }}
+          />
+          <button
             className="cursor-pointer"
             onClick={() => {
               if (ref.current) {
                 ref.current.click();
               }
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                if (ref.current) {
+                  ref.current.click();
+                }
+              }
+            }}
           >
             Choose file
-          </label>
+          </button>
           {/* <LinkIcon
               className="w-6 h-6 cursor-pointer text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
               height={24}

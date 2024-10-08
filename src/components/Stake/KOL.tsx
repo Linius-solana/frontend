@@ -5,16 +5,15 @@ import dynamic from "next/dynamic";
 import { Input } from "@nextui-org/input";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-
 import { AccountAddress } from "@aptos-labs/ts-sdk";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 import Area from "./Area";
 
-import { API_URL, SOCIAL_ADDRESS } from "@/config/constants";
+import { API_URL } from "@/config/constants";
 import { accountKolBalance } from "@/view-functions/accountBalance";
-import { useWallet } from "@solana/wallet-adapter-react";
 
-interface KOLProps extends React.HTMLAttributes<HTMLDivElement> { }
+interface KOLProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export type KOL = {
   user_address: string;
@@ -47,7 +46,9 @@ function KOL(props: KOLProps) {
       if (!kolAddress) return;
       console.log("Fetching balance for KOL address: ", kolAddress);
       const res = await accountKolBalance({
-        accountAddress: AccountAddress.fromString(wallet.publicKey?.toBase58()!),
+        accountAddress: AccountAddress.fromString(
+          wallet.publicKey?.toBase58()!,
+        ),
         kolAddress: AccountAddress.fromString(kolAddress),
       });
 
@@ -62,12 +63,12 @@ function KOL(props: KOLProps) {
     /*
     @todo: Need to convert to Solana
     */
-    await wallet.signAndSubmitTransaction({
-      data: {
-        function: `${SOCIAL_ADDRESS}::social::register_kol`,
-        functionArguments: [kolAddress, stakeAmount],
-      },
-    });
+    // await wallet.signAndSubmitTransaction({
+    //   data: {
+    //     function: `${SOCIAL_ADDRESS}::social::register_kol`,
+    //     functionArguments: [kolAddress, stakeAmount],
+    //   },
+    // });
   };
 
   const handleSelectChange = (value: string) => {
@@ -137,26 +138,10 @@ function KOL(props: KOLProps) {
 
         {/* Percentage buttons */}
         <div className="flex justify-between w-full mt-2 flex-wrap gap-2">
-          <Button
-            onClick={() => handlePercentage(0.25)}
-          >
-            25%
-          </Button>
-          <Button
-            onClick={() => handlePercentage(0.5)}
-          >
-            50%
-          </Button>
-          <Button
-            onClick={() => handlePercentage(0.75)}
-          >
-            75%
-          </Button>
-          <Button
-            onClick={() => handlePercentage(1)}
-          >
-            Max
-          </Button>
+          <Button onClick={() => handlePercentage(0.25)}>25%</Button>
+          <Button onClick={() => handlePercentage(0.5)}>50%</Button>
+          <Button onClick={() => handlePercentage(0.75)}>75%</Button>
+          <Button onClick={() => handlePercentage(1)}>Max</Button>
         </div>
 
         {/* Stake Button */}

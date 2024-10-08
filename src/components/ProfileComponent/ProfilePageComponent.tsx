@@ -8,14 +8,14 @@ import TransactionComponent from "./TransactionComponent";
 import ProjectInformationCard from "@/components/ProfileComponent/Project/ProjectInformationCard";
 import { MOCK_PROJECT_DATA, PROFILE } from "@/config/constants";
 
-const ProfilePageComponent = () => {
+const ProfilePageComponent = ({ address }: { address: string }) => {
   const userData = PROFILE;
   const mockProjectData = MOCK_PROJECT_DATA;
 
   return (
     <div className="w-full flex flex-col items-center justify-start">
       <ProfileComponent
-        address={userData.address}
+        address={address}
         avatarUrl={userData.avatar}
         backgroundUrl={userData.backgroundUrl}
         earningsNumber={userData.earningsNumber}
@@ -31,8 +31,8 @@ const ProfilePageComponent = () => {
         radius="full"
         variant="light"
       >
-        <Tab key="Transactions" title="Transactions" className="w-full">
-          <TransactionComponent />
+        <Tab key="Transactions" className="w-full" title="Transactions">
+          <TransactionComponent address={address} />
         </Tab>
         <Tab key="Me" title="Me">
           <ProjectInformationCard

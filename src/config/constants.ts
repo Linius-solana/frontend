@@ -72,17 +72,26 @@ export const MOCK_PROJECT_DATA = {
 };
 
 export const MOCK_POST_DATA: PostContentProps = {
-  author: faker.person.fullName(),
-  avatarUrl: faker.image.avatar(),
+  author: "Super Team VN",
+  avatarUrl: "/super_team.jpg",
   lastActive: 1,
   isActive: true,
-  imageUrl: faker.image.url(),
-  postContent: faker.lorem.paragraph(),
+  imageUrl: "/radar.jpg",
+  postContent:
+    "Colosseum's hackathons are intensive engineering and business sprints offering elite developers the chance to win prizes up to $50,000 in USDC, pre-seed funding, and mentorship across categories like Consumer, DeFi, Payments, DePIN, Gaming, Infrastructure, DAOs & Network States, as well as special awards for University teams, Public Goods, and Climate-friendly projects",
   commentList: [
-    faker.lorem.sentence(),
-    faker.lorem.sentence(),
-    faker.lorem.sentence(),
+    "Colosseum's hackathons seem like a fantastic opportunity for developers to showcase their skills while competing for significant prizes and funding. The focus on categories like DeFi, Gaming, and Climate-friendly projects makes it a well-rounded event for diverse innovators.",
   ],
+};
+
+export const MOCK_POST_DATA2: PostContentProps = {
+  author: "EyC8VijeYiCQK5immH22YFSttjDWBDSeoh8CsTMXRjgF",
+  avatarUrl: "/solana_image.jpg",
+  lastActive: 1,
+  isActive: true,
+  imageUrl: "/wif.jpeg",
+  postContent: "Trade $WIF on Raydium for best prices 👍👍",
+  commentList: ["LFG 🚀", "Best $WIF 🚀"],
 };
 
 export const MOCK_PROJECT_DETAILS = {

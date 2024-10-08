@@ -3,15 +3,9 @@
 import dynamic from "next/dynamic";
 import React, { useEffect, useState } from "react";
 import { Input, Button } from "@nextui-org/react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 import Area from "./Area";
-
-import {
-  accountProtocolBalance,
-  accountStakedAmount,
-} from "@/view-functions/accountBalance";
-import { SOCIAL_ADDRESS } from "@/config/constants";
-import { useWallet } from "@solana/wallet-adapter-react";
 
 interface ProtocolProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -24,9 +18,9 @@ function Protocol(props: ProtocolProps) {
   useEffect(() => {
     const fetchBalance = async () => {
       if (!wallet.connected) return;
-      const balance = await accountProtocolBalance({
-        accountAddress: wallet.publicKey.toBase58(),
-      });
+      // const balance = await accountProtocolBalance({
+      //   accountAddress: wallet.publicKey.toBase58(),
+      // });
 
       setBalance(balance / 10 ** 8); // Convert the balance to the correct decimal
     };
@@ -36,14 +30,13 @@ function Protocol(props: ProtocolProps) {
 
   useEffect(() => {
     const fetchStaked = async () => {
-      if (!wallet.account?.address) return;
-      const stakedBalance = await accountStakedAmount({
-        accountAddress: AccountAddress.fromString(wallet.account.address),
-      });
-
-      if (stakedBalance > 0) {
-        setIsStaked(true);
-      }
+      // if (!wallet.account?.address) return;
+      // const stakedBalance = await accountStakedAmount({
+      //   accountAddress: AccountAddress.fromString(wallet.account.address),
+      // });
+      // if (stakedBalance > 0) {
+      //   setIsStaked(true);
+      // }
     };
 
     fetchStaked();
@@ -52,12 +45,12 @@ function Protocol(props: ProtocolProps) {
   const handleStake = async (event: React.FormEvent) => {
     event.preventDefault();
     // Add your staking logic here
-    await wallet.signAndSubmitTransaction({
-      data: {
-        function: `${SOCIAL_ADDRESS}::social::first_time_stake_native`,
-        functionArguments: ["user_name", stakeAmount * 10 ** 8, 0],
-      },
-    });
+    // await wallet.signAndSubmitTransaction({
+    //   data: {
+    //     function: `${SOCIAL_ADDRESS}::social::first_time_stake_native`,
+    //     functionArguments: ["user_name", stakeAmount * 10 ** 8, 0],
+    //   },
+    // });
   };
 
   const handlePercentage = (percentage: number) => {

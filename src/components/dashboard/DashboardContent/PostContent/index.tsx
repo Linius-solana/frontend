@@ -2,6 +2,7 @@
 
 import { Avatar, Divider, Image, Textarea } from "@nextui-org/react";
 import React from "react";
+import { useRouter } from "next/navigation";
 
 import { HeartIcon } from "@/components/shared/icon/HeartIcon";
 import LogoIcon from "@/components/shared/icon/LogoIcon";
@@ -27,6 +28,8 @@ const PostContent = ({
   postContent,
   commentList,
 }: PostContentProps) => {
+  const router = useRouter();
+
   return (
     <div className="py-4 rounded-lg shadow-lg w-full mx-auto flex flex-col gap-4">
       <div className="flex items-center mb-4">
@@ -43,7 +46,22 @@ const PostContent = ({
         </div>
         <div>
           <div className="flex flex-row flex-wrap gap-2 items-center justify-start">
-            <div className="font-bold text-lg">{author}</div>
+            <div
+              className="font-bold text-lg"
+              role="button"
+              tabIndex={0}
+              onClick={(e) => {
+                e.preventDefault();
+                router.push("/account/" + author);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                }
+              }}
+            >
+              {author}
+            </div>
             <div className="text-gray-400 text-sm">
               {isActive ? `• Active ${lastActive} minutes ago` : "Inactive"}
             </div>
