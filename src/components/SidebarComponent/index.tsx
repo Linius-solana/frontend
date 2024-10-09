@@ -10,6 +10,7 @@ import {
 } from "iconsax-react";
 import { useContext, useMemo } from "react";
 import { Vault } from "lucide-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 import { UserContext } from "../userContext/UserContext";
 
@@ -18,8 +19,7 @@ import { Sidebar } from "./sidebar.style";
 import SidebarItem from "./SidebarItem";
 import SidebarMenu from "./SidebarMenu";
 
-import { PROFILE, SOCIAL_ADDRESS } from "@/config/constants";
-import { useWallet } from "@solana/wallet-adapter-react";
+import { PROFILE } from "@/config/constants";
 
 const SidebarComponent = () => {
   const profile = useContext(UserContext);
@@ -35,7 +35,9 @@ const SidebarComponent = () => {
       {
         title: "Profile",
         icon: <User />,
-        href: "/account" + (wallet.publicKey ? `/${wallet.publicKey.toBase58()}` : ""),
+        href:
+          "/account" +
+          (wallet.publicKey ? `/${wallet.publicKey.toBase58()}` : ""),
       },
       {
         title: "Notification",

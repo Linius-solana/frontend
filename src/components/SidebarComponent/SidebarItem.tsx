@@ -25,7 +25,7 @@ const SidebarItem = ({ title, icon, href, isActive }: SidebarItemProps) => {
             ? "bg-foreground-100 text-foreground-900 [&_svg_path]:fill-foreground-300"
             : "hover:bg-default-100",
           "flex gap-2 w-full min-h-[44px] h-full items-center px-3.5 rounded-xl cursor-pointer transition-all duration-150 active:scale-[0.98]",
-          "text-default-500"
+          "text-default-500",
         )}
       >
         {icon}

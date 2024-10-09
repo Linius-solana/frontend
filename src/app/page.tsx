@@ -4,15 +4,15 @@ import { Code } from "@nextui-org/code";
 import { Link } from "@nextui-org/link";
 import { Snippet } from "@nextui-org/snippet";
 import { button as buttonStyles } from "@nextui-org/theme";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 import { GithubIcon } from "@/components/icons";
 import { subtitle, title } from "@/components/primitives";
 import { siteConfig } from "@/config/site";
 import PageDashboard from "@/app/home/page";
-import { useWallet } from "@solana/wallet-adapter-react";
 
 export default function Home() {
-  const {connected} = useWallet();
+  const { connected } = useWallet();
 
   if (connected) {
     return <PageDashboard />;

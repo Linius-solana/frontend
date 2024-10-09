@@ -1,8 +1,8 @@
 import { WebIrys } from "@irys/sdk";
 import { AccountAddress } from "@aptos-labs/ts-sdk";
+import { WalletContextState } from "@solana/wallet-adapter-react";
 
 import { accountAPTBalance } from "@/view-functions/accountBalance";
-import { WalletContextState } from "@solana/wallet-adapter-react";
 
 const getWebIrys = async (solonaWallet: WalletContextState) => {
   const network = "devnet"; // Irys network
@@ -38,7 +38,7 @@ export const checkIfFund = async (
   if (!currentAccountAddress) {
     throw new Error("Account address not found");
   }
-  
+
   const currentAccountBalance = await accountAPTBalance({
     accountAddress: AccountAddress.fromString(currentAccountAddress),
   });

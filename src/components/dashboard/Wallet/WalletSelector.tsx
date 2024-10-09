@@ -1,9 +1,8 @@
 "use client";
 
-import { Modal, useDisclosure } from "@nextui-org/react";
+import { useDisclosure } from "@nextui-org/react";
 import React from "react";
 import { toast } from "react-toastify";
-import { Button } from "@nextui-org/react";
 import dynamic from "next/dynamic";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletConnectButton } from "@solana/wallet-adapter-react-ui";

@@ -10,13 +10,11 @@ import {
   Skeleton,
 } from "@nextui-org/react";
 import { ArrowRight01Icon } from "hugeicons-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 
-import LogoIcon from "../shared/icon/LogoIcon";
-import WalletSelector from "../dashboard/Wallet/WalletSelector";
+import ConnectWalletDialog from "../dashboard/Wallet/ConnectWalletDialog";
 
 import { truncateText } from "@/helpers";
-import { useWallet } from "@solana/wallet-adapter-react";
-import ConnectWalletDialog from "../dashboard/Wallet/ConnectWalletDialog";
 
 export type ProfileAccordionProps = {
   address: string;
@@ -42,9 +40,9 @@ const ProfileAccordion = ({ name, address }: ProfileAccordionProps) => {
         <div className="flex items-center gap-4 px-4 py-3 rounded-2xl bg-foreground-50 border border-default/25">
           <div className="flex-shrink-0">
             <Avatar
-              src={wallet?.adapter.icon}
               alt="Wallet"
               className="w-10 h-10"
+              src={wallet?.adapter.icon}
             />
           </div>
           <div className="flex flex-col justify-center overflow-hidden">
@@ -63,7 +61,9 @@ const ProfileAccordion = ({ name, address }: ProfileAccordionProps) => {
       <DropdownMenu aria-label="Dynamic Actions">
         <DropdownItem key="profile">Profile</DropdownItem>
         <DropdownItem key="settings">Settings</DropdownItem>
-        <DropdownItem key="logout" onClick={disconnect}>Logout</DropdownItem>
+        <DropdownItem key="logout" onClick={disconnect}>
+          Logout
+        </DropdownItem>
       </DropdownMenu>
     </Dropdown>
   );
